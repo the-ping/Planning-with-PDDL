@@ -30,7 +30,7 @@ served(x)
 
 1.5
 
-buff(BUFF)^ub(UB)^uf(UF)^mb(MB)^mf(MF)^lb(LB)^lf(LF)
+locaotion(BUFF)^location(UB)^location(UF)^location(MB)^location(MF)^location(LB)^location(LF)
 ^
 adj(BUFF,UF)^adj(UF,UB)^adj(UB,MB)^adj(MB,LB)^adj(LB,LF)^adj(LF,MF)^adj(MF,UF)
 ^
@@ -44,7 +44,7 @@ customer(C)^at(C,LB)
 
 
 Action(PickUpPlate(A,P,L)) --agent 'A' picks up plate 'P' at location 'L' 
-precondition: agent(A) ^ plate(P) ^ location(l) ^ ¬holdplate(A, P) ^ at(A, L) ^ at(P, L)
+precondition: agent(A) ^ plate(P) ^ location(l) ^ Â¬holdplate(A, P) ^ at(A, L) ^ at(P, L)
 effect: holdplate(A, P)
 
 1.7
@@ -57,14 +57,14 @@ effect: served(C)
 
 
 Action(Fill(A,P))  --waiter fills plate 'P' 
-precondition: plate(P) ^ ¬hasfood(P) ^ agent(A) ^ holdplate(A,P) ^ location(BUFF) ^ at(A, BUFF)
+precondition: plate(P) ^ Â¬hasfood(P) ^ agent(A) ^ holdplate(A,P) ^ location(BUFF) ^ at(A, BUFF)
 effect: hasfood(P)
 
 1.9
 
 Action(Move(A,x,y)) --waiter moves from x to y
 precondition: location(x) ^ location(y) ^ adj(x,y) ^ agent(A) ^ at(A,x)
-effect: at(A,y) ^ ¬at(A,x)
+effect: at(A,y) ^ Â¬at(A,x)
 
 1.10
 
@@ -75,7 +75,7 @@ Goal State: served(C)
 PLAN:  
 g0 = served(C)
 Action: HandOverPlate(A,P,C,L)
-Precond: hasfood(P)^holdplate(A,P)^at(C,UF)^at(A,UF)^¬served(C)
+Precond: hasfood(P)^holdplate(A,P)^at(C,UF)^at(A,UF)^Â¬served(C)
 
 g1 = at(A,UF)
 Action: Move(A,BUFF,UF)
@@ -83,11 +83,11 @@ Precond: hasfood(P)^holdplate(A,P)^at(A,BUFF)^adj(uf,buff)
 
 g2 = hasfood(P)
 Action: Fill(P)
-Precond: holdplate(A,P)^at(A,BUFF)^¬hasfood(P)
+Precond: holdplate(A,P)^at(A,BUFF)^Â¬hasfood(P)
 
 g3 = holdplate(A,P)
 Action: PickUpPlate(A,P,L)
-Precond: agent(A)^buff(BUFF)^plate(P)^at(A,BUFF)^¬hasfood(P)
+Precond: agent(A)^buff(BUFF)^plate(P)^at(A,BUFF)^Â¬hasfood(P)
 
 
 Part 4:
