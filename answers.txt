@@ -1,0 +1,122 @@
+Part 1:
+
+1.1
+
+
+location(x) 
+adj(x,y) --x is adjacent to y
+
+1.2
+
+agent(x)
+plate(x)
+customer(x) 
+at(s,y) --'s'(something) is at 'y'(location)
+
+
+1.3
+
+plate(x)
+hasfood(x)
+holdplate(y, x) --where 'y' is agent
+
+
+1.4
+
+
+customer(x)
+served(x)
+
+
+1.5
+
+buff(BUFF)^ub(UB)^uf(UF)^mb(MB)^mf(MF)^lb(LB)^lf(LF)
+^
+adj(BUFF,UF)^adj(UF,UB)^adj(UB,MB)^adj(MB,LB)^adj(LB,LF)^adj(LF,MF)^adj(MF,UF)
+^
+agent(A)^at(A,BUFF)
+^
+plate(P)^at(P,BUFF)
+^
+customer(C)^at(C,LB)
+
+1.6
+
+
+Action(PickUpPlate(A,P,L)) --agent 'A' picks up plate 'P' at location 'L' 
+precondition: agent(A) ^ plate(P) ^ location(l) ^ ¬holdplate(A, P) ^ at(A, L) ^ at(P, L)
+effect: holdplate(A, P)
+
+1.7
+
+Action(HandOverPlate(A,P,C,L)) --waiter hands plate 'P' to customer'C' at location 'L'
+precondition: customer(C) ^ agent(A) ^ plate(P) ^ hasfood(P) ^ at(C, L) ^ at(A, L) ^ location(L) ^ holdplate(A, P)
+effect: served(C)
+
+1.8
+
+
+Action(Fill(A,P))  --waiter fills plate 'P' 
+precondition: plate(P) ^ ¬hasfood(P) ^ agent(A) ^ holdplate(A,P) ^ location(BUFF) ^ at(A, BUFF)
+effect: hasfood(P)
+
+1.9
+
+Action(Move(A,x,y)) --waiter moves from x to y
+precondition: location(x) ^ location(y) ^ adj(x,y) ^ agent(A) ^ at(A,x)
+effect: at(A,y) ^ ¬at(A,x)
+
+1.10
+
+Initial State: agent(A) ^ buff(BUFF) ^ customer(C) ^ uf(UF) ^ plate(P)
+ ^ at(A,BUFF) ^ at(P,BUFF) ^ at(C,UF) --closed world assumption, no need negated facts
+Goal State: served(C)
+
+PLAN:  
+g0 = served(C)
+Action: HandOverPlate(A,P,C,L)
+Precond: hasfood(P)^holdplate(A,P)^at(C,UF)^at(A,UF)^¬served(C)
+
+g1 = at(A,UF)
+Action: Move(A,BUFF,UF)
+Precond: hasfood(P)^holdplate(A,P)^at(A,BUFF)^adj(uf,buff)
+
+g2 = hasfood(P)
+Action: Fill(P)
+Precond: holdplate(A,P)^at(A,BUFF)^¬hasfood(P)
+
+g3 = holdplate(A,P)
+Action: PickUpPlate(A,P,L)
+Precond: agent(A)^buff(BUFF)^plate(P)^at(A,BUFF)^¬hasfood(P)
+
+
+Part 4:
+
+
+4.1
+
+
+We would need extra predicates to distinguish a hot dish from a cold dish and normal temperature : Cold(x), Hot(x), Norm(x). 
+
+If a dish is supposed to be hot or cold, then serve it, else get a new one that is of the right temperature. Dishes like sushi that is non-temperature important could be ignored and served anyways.
+
+We want to check if the dish about to be served is satisfactory temperature. For example, we have to check if the dish is still hot - by Hot(x), at any point of the actions before HandOverPlate. If false, we can execute new appropriate actions to deal with the 'spoilt' dishes in hand. 
+
+For example, ice cream can be Renewed(x). Tea and Coffee Reheated(x). 
+
+Also, to specify the types of dishes, tea, coffee, icecream and sushi. Each can have its own variable type. tea(x), coffee(x), etc.
+
+Regarding the order to which food is to be served first, since sushi temperature isn't taken into account, in cases where a set of orders arrive - the sushi is usually served after all the other temperature-conscious, and hence time-conscious, dishes.
+
+4.2
+
+
+
+To take social expectations in consideration, we cannot simply leave sushi dishes to be served last. The deciding factor of when a dish should be served would be the customers' "Patience" meter and the dish's "Prep Time" meter, and the Agent's "Performance" meter.
+
+"Prep Time" meter can be defined either Short(x) or Long(x). Short for tea,coffee, icecream. and Long for sushi. If a short-prep dish is ordered (customerA) at the same time or after a sushi (customerB), customerA can be served before customerB. However, how many Short(x) dishes can be prioritised over a waiting customer's Long(x) dish will be limited by the customer's Patience meter. 
+
+"Patience" meter has the initial state of 'full'. And the meter can only decrease in 2 ways : 1) as time pass. 2) by the number of customers being served before the waiting customer, given these customers made order at the same time or after that waiting customer. -- this meter determines the order of which dishes should be whipped first. (factor#1):For example, Agent can serve the dish as long within the reasonable waiting time. (factor#2):For example, even though teas take a shorter time to prep than sushis, only a certain maximum number of teas can be served before the waiting customer's "Patience" meter is left enough for his dish to be the most (urgently) prioritised. Hence, the usual goal of serving any Tea order before a Sushi order will be changed to prioritising serving Sushi to the 'almost' unhappy customer.
+
+"Performance" meter reflects an Agent's overall performance level. Based on how many unhappy/happy customers Agent has caused. If there has been many unhappy customers, let's say partly due to Agent's tiredness and hence slow performance, we can have a Rest(x) action for Agent to recover their health and be working at their top-performance level- hence reducing the likely chances of causing MORE unhappy customers.
+
