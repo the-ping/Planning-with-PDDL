@@ -1,4 +1,4 @@
-# inf2d-cw2
+# inf2d-cw2-Planning-with-PDDL
 **Course:**
 Informatics 2D: Reasoning and Agents (coursework 2 of 2)
 
